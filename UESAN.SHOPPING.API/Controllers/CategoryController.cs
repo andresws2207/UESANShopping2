@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using UESAN.SHOPPING.CORE.Core.Entities;
 using UESAN.SHOPPING.CORE.Core.Interfaces;
 
 namespace UESAN.SHOPPING.API.Controllers
@@ -22,9 +23,57 @@ namespace UESAN.SHOPPING.API.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategoryById(int id)
+        {
+            var category = await _categoryRepository.GetCategoryById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return Ok(category);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory([FromBody] Category category)
+        {
+            if (category == null)
+            {
+                return BadRequest();
+            }
 
+            await _categoryRepository.CreateCategory(category);
+            return NoContent();
+        }
 
+        //HttpPut api/category
+        [HttpPut]
+        public async Task<IActionResult> UpdateCategory([FromBody] Category category)
+        {
+            if (category == null)
+            {
+                return BadRequest();
+            }
+            var existingCategory = await _categoryRepository.GetCategoryById(category.Id);
+            if (existingCategory == null)
+            {
+                return NotFound();
+            }
+            await _categoryRepository.UpdateCategory(category);
+            return NoContent();
+        }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var existingCategory = await _categoryRepository.GetCategoryById(id);
+            if (existingCategory == null)
+            {
+                return NotFound();
+            }
+            await _categoryRepository.DeleteCategory(id);
+            return NoContent();
+        }
     }
+
 }
